@@ -5,17 +5,18 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   generate-and-deploy-docs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Install Doxygen
-        run: sudo apt-get install -y doxygen graphviz
+      - name: Setup Doxygen
+        uses: ssciwr/doxygen-install@v1
 
       - name: Generate Doxygen documentation
         run: doxygen docs/Doxyfile
@@ -25,5 +26,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: doxygen-docs
-          publish_dir: ./docs/html  # Adjust if your OUTPUT_DIRECTORY is different
+          publish_dir: ./docs/html
           force_orphan: true
