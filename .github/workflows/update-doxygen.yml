@@ -1,0 +1,29 @@
+name: Update Doxygen Documentation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate-and-deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Doxygen
+        run: sudo apt-get install -y doxygen graphviz
+
+      - name: Generate Doxygen documentation
+        run: doxygen docs/Doxyfile
+
+      - name: Deploy to doxygen-docs branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: doxygen-docs
+          publish_dir: ./docs/html  # Adjust if your OUTPUT_DIRECTORY is different
+          force_orphan: true
