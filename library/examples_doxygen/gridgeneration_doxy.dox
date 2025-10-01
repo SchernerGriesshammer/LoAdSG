@@ -1,0 +1,59 @@
+/**
+ * \page gridgeneration Grid Generation
+ *
+ *
+ * This example shows how to initialize a DataMatrix object, store it to a file and then to restore it back.
+ *
+ *
+ *  ##Configuring the Grid
+ *
+ * Start with defining the dimensionality of the grid.
+ * This is done by modifying the configuration file located at:
+ *
+ * `"library/source/abbrevi.h"`
+ *
+ * Example definition:
+ * @code
+ * #define DimensionSparseGrid 2
+ * @endcode
+ *
+ * ## Regular sparse grid
+ *
+ * This example initializes a regular sparse grid, using the class AdaptiveSparseGrid, refines it
+ * recursively around a center point, and outputs its structure
+ * in both textual and GNU plotting formats. It illustrates how
+ * to:
+ *   - Define the refinement level of the grid.
+ *   - Add recursive sons (children) of a given point.
+ *   - Print grid points at specified levels.
+ *   - Export the grid structure for visualization.
+ *
+ *
+ * \include gridgeneration.cpp
+ *
+ *
+ *
+ * ## Adaptive Sparse Grid
+ *
+ * Next, we want to generate an adaptive sparse grid. Let us do this in more detail. We start by initializing an adaptive sparse grid, defining grid points (IndexDimension) and adding them to our grid.
+ *
+ *
+ * \snippet gridgeneration_adaptive.cpp start
+ *
+ * In order to perform a Matrix-Vector-Multiplication on such a grid, we need to add grid points. Theory can be found in
+ *
+ * > Paper
+ * > Paper
+ * > Paper
+ * > Paper
+ * > Paper
+ * >
+
+ *  This is done as follows:
+ * \snippet gridgeneration_adaptive.cpp completegrid
+ *
+ * Finally we can export the grid structure.
+ * \snippet gridgeneration_adaptive.cpp end
+ *
+ */
+

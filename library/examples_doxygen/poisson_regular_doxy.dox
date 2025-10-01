@@ -1,0 +1,13 @@
+/**
+ * \page poissonregular Poisson Problem
+ *
+ * This example shows how to solve the Poisson equation  \f$ -\Delta u = f \f$ on regular sparse grids.
+ *
+ * Start by including the library and definining the functions \f$ u=\prod_{i=1}^{d} \sin(\pi x_i)  \f$ and \f$ f=-\Delta u \f$.
+ * \snippet poisson_regular.cpp start
+ * \snippet poisson_regular.cpp main
+ * \snippet poisson_regular.cpp error
+ */
+
+
+
