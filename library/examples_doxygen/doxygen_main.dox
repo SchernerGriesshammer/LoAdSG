@@ -5,7 +5,7 @@
 
 /**
  * \mainpage ExPDESG: Expression Templates for PDEs on Sparse Grids
- * ExPDESG is a C++ library for solving high-dimensional elliptic partial differential equations with variable coefficients on locally adaptive sparse grids.
+ * LoAdSG is a C++ library for solving high-dimensional elliptic partial differential equations with variable coefficients on locally adaptive sparse grids.
  *
  * ExPDESG is open-source software delivered as source code. By using any part of the software or resources from this documentation, you implicitly accept the copyright terms (see Copyright).
  * If you do, please give us credit by citing ExPDESG in your publications. For information on how to cite SG++ in your publications, please refer to the \ref citation "How to Cite" section.
