@@ -1,4 +1,4 @@
 build/
 # Ignore Doxygen output directories
-documentation/html/
-documentation/latex/
+docs/html/
+docs/latex/
