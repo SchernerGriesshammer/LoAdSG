@@ -1,30 +1,31 @@
-name: Update Doxygen Documentation
+name: Build and Publish Doxygen Docs
 
 on:
   push:
     branches:
       - main
 
-permissions:
-  contents: write
-
 jobs:
-  generate-and-deploy-docs:
+  generate-docs:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout main branch
+      - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # required to push to another branch
 
-      - name: Setup Doxygen
-        uses: ssciwr/doxygen-install@v1
+      - name: Install Doxygen
+        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
-      - name: Generate Doxygen documentation
-        run: doxygen docs/Doxyfile
+      - name: Generate documentation
+        working-directory: ./docs
+        run: doxygen Doxyfile
 
-      - name: Deploy to doxygen-docs branch
+      - name: Deploy HTML docs to doxygen-html branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: doxygen-docs
-          publish_dir: ./docs/html
-          force_orphan: true
+          publish_branch: doxygen-html   # <-- your separate branch for HTML output
+          publish_dir: ./docs/html       # <-- adjust if Doxygen outputs elsewhere
+          commit_message: "Update Doxygen HTML docs from main"
