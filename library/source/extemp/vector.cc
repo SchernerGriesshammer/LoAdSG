@@ -187,12 +187,7 @@ bool VectorSparseG::operator==(const VectorSparseG& v)
 
 	
 
-/** \defgroup group2 Print
- * \brief this group contains all functions that are needed for printing out values
- * 
- * This is a group description.
-*/
- //@{
+
 void VectorSparseG::Print(int level)
 {
     myAssert(DimensionSparseGrid <= 2);
@@ -536,7 +531,7 @@ void VectorSparseG::Print_gnu(string name){
 
   Datei.close();
 }
-//@}
+
 
 
 

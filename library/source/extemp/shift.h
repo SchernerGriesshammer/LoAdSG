@@ -208,7 +208,7 @@ inline double ShiftExpr<A>::getValue(int i, const IndexDimension& K)const{
 //////////////////////
  
         
-/** \addtogroup ApplicationGroup **/
+
 /* @{ */        
 /**
  *Example:\verbatim
@@ -432,7 +432,7 @@ template<typename A> double ShiftDimensionExpr<A>::getValue(int i, const IndexDi
 /////////////////////////////////////////
 
 
-/** \addtogroup ApplicationGroup **/
+
 /* @{ */  
 /*class ShiftOperatorDimension{
    

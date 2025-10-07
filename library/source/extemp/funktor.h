@@ -54,7 +54,7 @@ public:
 #include <cmath>
 
 
-/** \addtogroup ApplicationGroup **/
+
 template<class Func>
 class Functor {
 public:

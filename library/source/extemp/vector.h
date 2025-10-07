@@ -243,11 +243,7 @@ operator|(double d, const IndexDimension &itObj) {
 template<class B>
 class DWrapSim;
 
-/** \defgroup group1 Title
- * 
- * This is a group description.
-*/
- //@{
+
  class VectorSparseG : public ExprSparseG<VectorSparseG> {
      template<class B>
      friend
@@ -443,7 +439,7 @@ class DWrapSim;
 
 
  };
-//@}
+
 
 
 

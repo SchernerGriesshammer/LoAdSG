@@ -35,8 +35,8 @@ using namespace std;
 // 1. coordinates
 //////////////////////////////////////
 
-/** \addtogroup ApplicationGroup **/
-/* @{ */
+
+
 class Coordinate : public ExprSparseG<Coordinate> {		
 	public:			
 		Coordinate(AdaptiveSparseGrid_Base& sg, int dimension_);
@@ -52,11 +52,8 @@ class Coordinate : public ExprSparseG<Coordinate> {
 		int dimension;
 		AdaptiveSparseGrid_Base* sparseGrid;		
 };
-//@}
-/*double Coordinate::getValue(double* data, const IndexDimension& I) const {
-  return I.coordinate(dimension);
-}*/
-/* @} */
+
+
 
 
 

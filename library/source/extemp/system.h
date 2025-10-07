@@ -112,7 +112,7 @@ class DExprLIT : public ExprSparseG<DExprLIT> {
 // system of equation operators
 ///////////////////////////////////////////////////
 
-/** \addtogroup ApplicationGroup **/
+
 /* @{ */  
 
 template<class A, class B>

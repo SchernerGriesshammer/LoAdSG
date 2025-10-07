@@ -6,13 +6,8 @@
 #include <cmath>
 
 
-/** \defgroup ExampleGroup  ''Often used examples''    
- **/
-/* @{  */ 
-/**
- * examples of functors which are often used
- * 
- **/
+
+
 class SinFunctor {
 public:
     SinFunctor() = default;
@@ -139,7 +134,6 @@ private:
 
 
 
-/* @} */
   
 
 
