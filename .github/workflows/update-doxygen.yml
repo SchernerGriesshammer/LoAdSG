@@ -33,3 +33,4 @@ jobs:
           publish_branch: doxygen-html   # <-- your separate branch for HTML output
           publish_dir: ./docs/html       # <-- adjust if Doxygen outputs elsewhere
           commit_message: "Update Doxygen HTML docs from main"
+          force_orphan: true 
