@@ -1,4 +1,7 @@
-build/
+library/build/
+library/cmake-build-debug/
+library/.idea/
 # Ignore Doxygen output directories
 docs/html/
 docs/latex/
+

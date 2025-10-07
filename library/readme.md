@@ -6,7 +6,7 @@
    ```
 2. create build forlder
    ```sh
-   cd expdesg/library
+   cd library
    mkdir build
    cd build
    cmake -DCMAKE_BUILD_TYPE=Release -DMAIN_FILE="./main2.cpp" ..
@@ -53,7 +53,7 @@ Call cmake with ``-DMAIN_FILE="./main2.cpp"``:
 ## Or by overwriting default in CMakeList.txt
    In
    ```sh
-   ../expdesg/library/CmakeLists.txt
+   ../LoAdSG/library/CmakeLists.txt
    ```
    replace main_file.cpp with desired main file:
    ```sh

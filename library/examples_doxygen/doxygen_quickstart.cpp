@@ -9,7 +9,7 @@
    ```
 2. create build folder
    ```sh
-   cd expdesg/library
+   cd library
    mkdir build
    cd build
    ```
@@ -58,7 +58,7 @@ Call cmake with ``-DMAIN_FILE="./main2.cpp"``:
 ### Or by overwriting default in CMakeList.txt
    In
    ```sh
-   ../expdesg/library/CmakeLists.txt
+   ../LoAdSG/library/CmakeLists.txt
    ```
    replace main_file.cpp with desired main file:
    ```sh
