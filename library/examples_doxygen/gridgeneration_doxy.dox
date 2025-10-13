@@ -40,15 +40,8 @@
  *
  * \snippet gridgeneration_adaptive.cpp start
  *
- * In order to perform a Matrix-Vector-Multiplication on such a grid, we need to add grid points. Theory can be found in
+ * In order to perform a Matrix-Vector-Multiplication on such a grid, we need to add grid points.
  *
- * > Paper
- * > Paper
- * > Paper
- * > Paper
- * > Paper
- * >
-
  *  This is done as follows:
  * \snippet gridgeneration_adaptive.cpp completegrid
  *
