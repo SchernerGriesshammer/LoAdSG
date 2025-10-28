@@ -2,7 +2,7 @@
  * \page gridgeneration Grid Generation
  *
  *
- * This example shows how to initialize a DataMatrix object, store it to a file and then to restore it back.
+ * 
  *
  *
  *  ##Configuring the Grid
