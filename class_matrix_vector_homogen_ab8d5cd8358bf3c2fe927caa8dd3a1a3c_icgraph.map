@@ -1,0 +1,7 @@
+<map id="MatrixVectorHomogen::applyStencilGlobal_MPI_3" name="MatrixVectorHomogen::applyStencilGlobal_MPI_3">
+<area shape="rect" id="Node000001" title=" " alt="" coords="437,5,636,45"/>
+<area shape="rect" id="Node000002" href="$class_matrix_vector_homogen.html#a4c725a54e6d5244a65c9239090741244" title=" " alt="" coords="221,5,389,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="424,28,389,28,389,23,424,23"/>
+<area shape="rect" id="Node000003" href="$class_matrix_vector_homogen.html#a09d9521f43e0f1e2e7db89370648b248" title="Distribute the cases with dynamic mpi_scheduling." alt="" coords="5,5,173,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="207,28,174,28,174,23,207,23"/>
+</map>
