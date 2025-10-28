@@ -23,6 +23,15 @@
  * We appreciate any feedback on how to improve the documentation, user experience, and application support. We are always looking for new collaborations to expand our capabilities and incorporate new applications.
  *
  * \section citation How to Cite
+ > @software{Scherner-Griesshammer_LoAdSG_-_Locally_2025,
+>author = {Scherner-Grießhammer, Riccarda and Pflaum, Christoph},
+>doi = {10.5281/zenodo.17397585},
+>month = oct,
+>title = {{LoAdSG - Locally Adaptive Sparse Grids}},
+>url = {https://github.com/SchernerGriesshammer/LoAdSG},
+>version = {0.1.0},
+>year = {2025}
+}
  *
  */
 
