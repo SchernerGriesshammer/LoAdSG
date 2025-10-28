@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Scherner-Grießhammer"
+  given-names: "Riccarda"
+  orcid: "https://orcid.org/0009-0005-9277-7638"
+- family-names: "Pflaum"
+  given-names: "Christoph"
+  orcid: "https://orcid.org/0000-0001-9598-1849"
+title: "LoAdSG - Locally Adaptive Sparse Grids"
+version: 0.1.0
+doi: 10.5281/zenodo.17397585
+date-released: 2025-10-20
+url: "https://github.com/SchernerGriesshammer/LoAdSG"
