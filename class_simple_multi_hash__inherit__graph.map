@@ -1,0 +1,7 @@
+<map id="SimpleMultiHash&lt; T, D &gt;" name="SimpleMultiHash&lt; T, D &gt;">
+<area shape="rect" id="Node000001" title="A simple multihash implementation. Is able to store multiple elements with the same hash." alt="" coords="171,5,361,31"/>
+<area shape="rect" id="Node000002" href="$class_simple_multi_hash.html" title=" " alt="" coords="5,93,252,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="230,39,199,57,151,95,147,91,197,52,227,35"/>
+<area shape="rect" id="Node000003" href="$class_simple_multi_hash.html" title=" " alt="" coords="275,93,534,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="343,33,377,53,392,72,402,92,397,94,388,74,374,57,341,38"/>
+</map>

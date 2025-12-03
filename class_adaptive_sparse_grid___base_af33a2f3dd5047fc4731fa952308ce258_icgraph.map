@@ -1,0 +1,12 @@
+<map id="AdaptiveSparseGrid_Base::occupied" name="AdaptiveSparseGrid_Base::occupied">
+<area shape="rect" id="Node000001" title=" " alt="" coords="260,101,411,141"/>
+<area shape="rect" id="Node000002" href="$class_local_for_tensor.html#ab4669b714194cdc7e14317f2b80d0d32" title=" " alt="" coords="5,5,212,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="287,97,211,60,179,48,181,43,213,55,289,92"/>
+<area shape="rect" id="Node000003" href="$class_adaptive_sparse_grid___base.html#afba92ad8bd28d0571f67e7d17b05e86c" title="prints active nodes (o) and hanging nodes (x)" alt="" coords="11,69,206,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="246,111,206,106,207,100,246,106"/>
+<area shape="rect" id="Node000004" href="$class_adaptive_sparse_grid___base.html#a9bead8f303d386701aeb525e25598e92" title="prints all nodes and highlights given Indices" alt="" coords="23,133,195,173"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="246,137,195,144,194,139,246,131"/>
+<area shape="rect" id="Node000005" href="$class_local_for_tensor.html#a830794e25eec3463dcd234cfdd55efa2" title=" " alt="" coords="15,221,202,261"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="286,150,149,224,146,219,283,146"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="147,210,134,203,109,200,87,202,74,207,69,213,71,220,66,222,64,212,71,202,86,197,109,195,135,198,150,205"/>
+</map>

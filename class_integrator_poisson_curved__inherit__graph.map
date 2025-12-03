@@ -1,0 +1,7 @@
+<map id="IntegratorPoissonCurved" name="IntegratorPoissonCurved">
+<area shape="rect" id="Node000001" title=" " alt="" coords="46,183,229,208"/>
+<area shape="rect" id="Node000002" href="$class_interface_local_stiffness_matrices.html" title=" " alt="" coords="5,108,269,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,148,140,182,135,182,135,148"/>
+<area shape="rect" id="Node000003" href="$class_interface_local_stiffness_matrices.html" title=" " alt="" coords="24,5,251,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="140,59,140,108,135,108,135,59"/>
+</map>
