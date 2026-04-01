@@ -186,6 +186,58 @@ void AdaptiveSparseGrid_Base::PrintActiveHanging(int level) {
     }
 }
 
+void AdaptiveSparseGrid_Base::PrintActiveHanging(Depth T,int level) {
+    int N = 1;
+    for (int i = 0; i < level; ++i) N = N * 2;
+    N = N + 1;
+
+    cout << "     " << "\n";
+    cout << "active (o) and hanging (x) nodes on grid " << endl;
+    cout << "------------------------- " << endl;
+    IndexDimension I;
+    I = IndexOneD(startUnitInterval);
+
+    for (int d = 2; d < DimensionSparseGrid; d++)
+        I.replace(d, centerUnitInterval);
+
+
+    unsigned long indexOfData;
+    //unsigned int numberOfData = sparseGrid->numberOfData;
+    //double* dataTable        = sparseGrid->dataTable;
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            Depth TI(I);
+
+            if (occupied(indexOfData, I) && TI==T) {
+                // cout << " " << (int)dataTable[indexOfData * numberOfData + number] << " ";
+                //	      cout << " " << indexOfData << " ";
+
+                if (isActiveNodeTable[indexOfData]) {
+                    cout << " o ";
+                } else {
+                    cout << " x ";
+
+                    //if(typeOfHangingNode[indexOfData]==0){cout << " x ";}
+                    //else cout << " + ";
+                }
+
+
+            } else {
+                if(I.isAtBoundary())
+                    cout << " + ";
+                else
+                    cout << "   ";
+            }
+            I = I.nextRight(0, level);
+        }
+        std::cout << endl;
+        I.replace(0, IndexOneD(startUnitInterval));
+        if (DimensionSparseGrid > 1) I = I.nextRight(1, level);
+        else break;
+
+    }
+}
+
 void AdaptiveSparseGrid_Base::PrintGridIndices(int level, IndexDimension* Indices, int numberofindices){
     int N = 1;
     for (int i = 0; i < level; ++i) N = N * 2;
@@ -774,6 +826,7 @@ void AdaptiveSparseGrid::completeDirichletGrid() {
     completeGridWithoutBoundary();
 
    CompleteToLocalTensorProductGrid();
+    return;
 
        completeGridWithoutBoundary();
 
@@ -785,6 +838,8 @@ void AdaptiveSparseGrid::completeDirichletGrid() {
 
 
 }
+
+
 
 void AdaptiveSparseGrid::completeDirichletGrid_NEU() {
 

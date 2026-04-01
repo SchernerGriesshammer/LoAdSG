@@ -4,7 +4,7 @@
 add_library(
         Applications
 
-
+        power_method.h
 
 
         cg_method.cpp cg_method.h

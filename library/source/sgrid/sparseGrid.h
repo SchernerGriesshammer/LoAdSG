@@ -120,6 +120,8 @@ public:
     //! prints active nodes (o) and hanging nodes (x)
     void PrintActiveHanging(int level);
 
+    void PrintActiveHanging(Depth T,  int level);
+
     //! prints all nodes and highlights given Indices
     void PrintGridIndices(int level, IndexDimension* Indices, int numberofindices);
 

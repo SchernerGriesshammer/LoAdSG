@@ -13,6 +13,9 @@ enum TypeMatrixVectorMultiplication  { StencilOnTheFly, StoreLocalStiffnessMatri
 
 class PoissonStencil {
 public:
+    inline void resetActiveWorkers(){};
+    inline void applyLocalStiffnessMatricesDepth(VectorSparseG& u,VectorSparseG& z,Depth T){};
+
     virtual inline void applyStencilOnCell_MPI_OMP(CellDimension& cell,VectorSparseG& input, VectorSparseG& output) {
         cout << " PoissonStencil::applyStencilOnCell_MPI_OMP NOT IMPLEMENTED YET!" << endl;
         exit(1);

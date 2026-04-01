@@ -24,7 +24,120 @@
 #include <sstream>
 #include <sys/time.h>
 
+class NodalTransformationTest
+{
+public:
+    NodalTransformationTest(VectorSparseG u_):u(u_){};
+    NodalTransformationTest(VectorSparseG u_, bool* nodal_):u(u_)
+    {
+        for (int d=0; d<DimensionSparseGrid; d++) nodal[d]=nodal_[d];
+    };
+    void resetU(VectorSparseG u_)
+    {
+        u=u_;
+        for (int d=0; d<DimensionSparseGrid; d++) nodal[d]=false;
+    };
 
+    void resetNodal(bool* nodal_)
+    {
+        for (int d=0; d<DimensionSparseGrid; d++) nodal[d]=nodal_[d];
+    };
+    void apply(VectorSparseG &output,Depth T, int d)
+    {
+        for (unsigned long i=0; i<u.getSparseGrid()->getMaximalOccupiedSecondTable(); i++)
+        {
+
+
+            {
+                IndexDimension I = u.getSparseGrid()->getIndexOfTable(i);
+                bool doit=false;
+
+
+                Depth TI(I);
+
+
+                for (int s=0; s<DimensionSparseGrid;s++)
+                {
+                    if (nodal[s]&&TI.at(s)<=T.at(s)) doit = true;
+
+                    else if (!nodal[s]&& TI.at(s)==T.at(s)) doit = true;
+
+                    else
+                    {
+                        doit = false;
+                        break;
+                    }
+
+
+                }
+
+
+
+
+                if (doit){
+
+                    if (TI.at(d)==1) output.addToValue(i,u.getValue(i));
+                    else if (I.isLinksRandNah(d))
+                    {
+
+                        IndexDimension center=I;
+                        IndexDimension right=I.nextRight(d,T.at(d));
+                        IndexDimension rightright=I.nextRight(d,T.at(d)).nextRight(d,T.at(d));
+
+                        double val = u.getValue(center);
+                        output.addToValue(center,0.9*val);
+                        output.addToValue(right,-0.6*val);
+                        output.addToValue(rightright,0.1*val);
+                    }
+                    else if (I.isRechtsRandNah(d))
+                    {
+
+                        IndexDimension center=I;
+                        IndexDimension left=I.nextLeft(d,T.at(d));
+                        IndexDimension leftleft=I.nextLeft(d,T.at(d)).nextLeft(d,T.at(d));
+
+
+                        double val= u.getValue(i);
+                        output.addToValue(center,0.9*val);
+
+                        output.addToValue(left,-0.6*val);
+                        output.addToValue(leftleft,0.1*val);
+                    }else
+                    {
+
+                        IndexDimension center=I;
+                        IndexDimension right=I.nextRight(d,T.at(d));
+                        IndexDimension rightright=I.nextRight(d,T.at(d)).nextRight(d,T.at(d));
+
+                        double val= u.getValue(i);
+
+                        output.addToValue(center,val);
+
+                        output.addToValue(right,-0.6*val);
+                        output.addToValue(rightright,0.1*val);
+                        IndexDimension left=I.nextLeft(d,T.at(d));
+                        IndexDimension leftleft=I.nextLeft(d,T.at(d)).nextLeft(d,T.at(d));
+
+
+                        output.addToValue(left,-0.6*val);
+                        output.addToValue(leftleft,0.1*val);
+
+                    }
+
+                }
+            }
+
+
+        }
+
+        nodal[d]=true;
+        u=output;
+    }
+private:
+    bool nodal[DimensionSparseGrid]{};
+    VectorSparseG u;
+
+};
 
 /**
  *  This class provides a Matrix-Vector-Multiplication on Dirichlet-SparseGrids
@@ -90,6 +203,9 @@ public:
      */
     template<class StencilClass>
     void multiplication(VectorSparseG &prew, VectorSparseG &Ax, StencilClass &stencilClass);
+
+    template<class StencilClass>
+ void multiplicationTest(VectorSparseG &prew, VectorSparseG &Ax, StencilClass &stencilClass);
 
 
     void multiplication_LocalStiffnessMatrix(VectorSparseG &prew, VectorSparseG& Ax, LocalStiffnessMatrices& localStiffnessMatrixAllDepths_){
@@ -331,6 +447,18 @@ private:
     void caseFunction(VectorSparseG &prew, bool *restrictions, StencilClass &stencil);
 
 
+    /**
+ * Calculates one of the 2^d cases.
+ *
+ *
+ * @tparam StencilClass Stencil shall be given by a class
+ * @param prew Function given in prewavelet basis
+ * @param restrictions 2^d cases of prolongations (=0) and restrictions=1)
+ * @param stencil
+ */
+    template<class StencilClass>
+    void caseFunctionNodal(VectorSparseG &prew, bool *restrictions, StencilClass &stencil);
+
 
     /**
  * Calculates one of the 2^d cases.
@@ -453,7 +581,7 @@ private:
                 SingleDepthHashGrid& depthGrid = grid->getMultiDepthHashGrid()->getGridForDepth(Tlocal);
                 const auto& mapping = depthGrid._mapPosToGridPos;
                 if(depthGrid.getNumberOfEntries()>0) {
-                    #pragma omp parallel for
+                  // #pragma omp parallel for
                     for (size_t i = 0; i < mapping.size(); i++) {
 
                         IndexDimension Index = depthGrid._map.getIndexOfTable(i);
@@ -541,7 +669,7 @@ private:
         SingleDepthHashGrid& depthGrid = Ax_nodal.getSparseGrid()->getMultiDepthHashGrid()->getGridForDepth(T);
         const auto& mapping = depthGrid._mapPosToGridPos;
 
-#pragma omp parallel for schedule(runtime)
+//#pragma omp parallel for schedule(runtime)
         for (size_t i = 0; i < mapping.size(); i++)
         {
             if(Ax_nodal.getSparseGrid()->getActiveTable()[mapping[i]]) {
@@ -603,6 +731,30 @@ private:
 
     void master_distribute_onlyCases();
 
+
+    void master_distribute_tasks2(){
+#ifdef MY_MPI_ON
+
+        int flag = 0;
+        MPI_Status status;
+
+        MPI_Iprobe(MPI_ANY_SOURCE, TAG_TASK, MPI_COMM_WORLD, &flag, &status);
+
+        while (flag && MPI_task_index < MPI_total_tasks) {
+            int worker_rank = status.MPI_SOURCE;
+            int received_signal;
+
+            MPI_Recv(&received_signal, 1, MPI_INT, worker_rank, TAG_TASK, MPI_COMM_WORLD, &status);
+
+            MPI_Send(&MPI_task_index, 1, MPI_INT, worker_rank, TAG_TASK, MPI_COMM_WORLD);
+
+            MPI_task_index++;
+
+            MPI_Iprobe(MPI_ANY_SOURCE, TAG_TASK, MPI_COMM_WORLD, &flag, &status);
+        }
+#endif
+    }
+
     template<class Problem>
     void master_distribute_onlyCases_LS(Problem& localStiffnessMatrices);
 
@@ -663,8 +815,6 @@ void MatrixVectorHomogen::multiplication(VectorSparseG &prew, VectorSparseG &Ax,
 if(matrixProblem.getTypeMatrixVectorMultiplication()==StencilOnTheFly) {
 
 
-
-
     Ax = 0.0;
     nodal = 0.0;
 
@@ -703,6 +853,7 @@ if(matrixProblem.getTypeMatrixVectorMultiplication()==StencilOnTheFly) {
             if (i % omp_get_num_threads() == omp_get_thread_num()) {
 
                 Depth T = *it;
+
                 u_nodal = 0.0;
                 calcNodal(u_nodal, prew, T);
                 nodal.setMultiLevelValuesOMP(u_nodal, T, MultiDepthHashGrid);
@@ -732,6 +883,7 @@ if(matrixProblem.getTypeMatrixVectorMultiplication()==StencilOnTheFly) {
         Ax_neu = 0.0;
 
         bool *restrictions = iter2.getcase();
+
         grid->WorkOnHangingNodes = true;
 
 
@@ -752,9 +904,60 @@ if(matrixProblem.getTypeMatrixVectorMultiplication()==StencilOnTheFly) {
 #endif
 }else{
 
+
     multiplication_LocalStiffnessMatrix_mpi(prew, Ax,matrixProblem);
     MPI_Barrier(MPI_COMM_WORLD);
 }
+
+}
+
+
+template<class Problem>
+void MatrixVectorHomogen::multiplicationTest(VectorSparseG &prew, VectorSparseG &Ax, Problem &matrixProblem) {
+
+
+
+
+    Ax = 0.0;
+    nodal = 0.0;
+
+    AdaptiveSparseGrid_Base *grid = prew.getSparseGrid();
+    int world_rank = 0;
+
+
+
+
+
+    grid->WorkOnHangingNodes = false;
+
+
+
+
+    stencil_count = 0;
+
+    for (CasesIterator iter2; iter2.goon(); ++iter2) {
+
+        Ax_neu = 0.0;
+
+        bool *restrictions = iter2.getcase();
+
+        grid->WorkOnHangingNodes = true;
+
+
+        Ax_neu = 0.0;
+        gM = 0.0;
+
+
+        stencil_count = 0;
+
+        caseFunctionNodal(prew, restrictions, matrixProblem);
+
+        grid->WorkOnHangingNodes = false;
+        Ax = Ax + Ax_neu;
+
+    }
+
+
 
 }
 
@@ -966,12 +1169,12 @@ void MatrixVectorHomogen::caseFunction(VectorSparseG &prew, bool *restrictions, 
 
 
 
+
     gM= 0.0;
     AdaptiveSparseGrid_Base *grid = prew.getSparseGrid();
 
 
     grid->WorkOnHangingNodes = true;
-
 
 
 
@@ -1021,12 +1224,208 @@ void MatrixVectorHomogen::caseFunction(VectorSparseG &prew, bool *restrictions, 
 
 
     for (Depth T: *sortedDepths){
+         grid->WorkOnHangingNodes = true;
+
+
+        u= 0.0;
+        u.setMultiLevelValues2(P,T);
+
+        z = 0.0;
+
+
+        stencil.initialize(T);
+
+
+
+
+        if(option_mpi){
+
+           applyStencilGlobal_MPI_3(u,z,stencil,T);
+
+       }else {
+           if (option_symmetry){
+          applyStencilGlobal_symmetry(u, z, stencil, T);
+
+           }
+           else applyStencilGlobal(u, z, stencil, T);
+       }
+
+#ifdef MY_MPI_ON
+
+        int rank;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        if(rank==0){
+            //master_distribute_tasks2();
+            master_distribute_onlyCases();
+        }
+
+#endif
+
+            z.addMultiLevelValues2(gM,T);
+
+
+
+       Depth Tcoarse(T);
+       for (int d = 0; d < DimensionSparseGrid; d++) {
+           if (restrictions[d]) {
+               Tcoarse.set(T.at(d) - 1, d);
+               if(depthList.isIncluded(Tcoarse)){
+                   restriction1D_inverted_inplace(z,Tcoarse.at(d),d);
+                   g = z;
+                   z.addMultiLevelValues2(gM,Tcoarse);
+                   gM.setMultiLevelValues2(g, Tcoarse);
+               }
+           }
+       }
+
+
+
+
+
+       grid->WorkOnHangingNodes=false;
+
+
+
+
+       if(depthList.isIncluded(Tcoarse))   ConvertToPrewavelet2(z, Ax_neu, Tcoarse);
+
+
+
+    }
+
+
+
+
+
+};
+
+
+
+template<class StencilClass>
+void MatrixVectorHomogen::caseFunctionNodal(VectorSparseG &prew, bool *restrictions, StencilClass &stencil) {
+
+
+
+
+    gM= 0.0;
+    AdaptiveSparseGrid_Base *grid = prew.getSparseGrid();
+
+
+    grid->WorkOnHangingNodes = true;
+
+
+
+    NodalTransformationTest PrimTransform(prew);
+    VectorSparseG u_nodal(u.getSparseGrid());
+    bool nodal_trafo[DimensionSparseGrid]{};
+
+
+    {
+
+        MultiDepthHashGrid MultiDepthHashGrid = *grid->getMultiDepthHashGrid();
+
+        int i = 0;
+
+        for (auto it = depthList.begin_all(); it != depthList.end_all(); ++it) {
+
+                PrimTransform.resetU(prew);
+
+                Depth T = *it;
+
+                for (int d=0; d<DimensionSparseGrid; d++)
+                {
+                    if (!restrictions[d])
+                    {
+                        u_nodal=0.0;
+                        PrimTransform.apply(u_nodal,T,d);
+                        nodal_trafo[d]=true;
+                    }
+                }
+                //u_nodal = 0.0;
+                //calcNodal(u_nodal, prew, T);
+
+                nodal.setMultiLevelValuesOMP(u_nodal, T, MultiDepthHashGrid);
+                u_nodal=0.0;
+
+            i++;
+        }
+
+
+    }
+
+
+
+    // Sortiere Tiefen nach Restriktionen/Prolongationen
+    depthList.sortDepths(restrictions);
+
+
+
+    std::list<Depth>* sortedDepths = depthList.getSortierteTiefen();
+    if(depthList.getSortierteTiefen()->size()==0) return;
+
+
+
+
+
+    // Prolongiere die nodalen Werte
+    P += nodal;
+
+
+
+   for(int d=0; d < DimensionSparseGrid; d++) {
+       if(restrictions[d]==0){
+           for (Depth T: *sortedDepths) {
+
+               int t = T.at(d) + 1;
+               Depth T_fine = T;
+               T_fine.set(t, d);
+
+
+               if(depthList.isIncluded(T_fine)){
+
+
+                   u_new = 0.0;
+                   u_new.setMultiLevelValues2(P,T);
+                   prolongation1D_inplace(u_new, t, d);
+
+
+                   P.addMultiLevelValues(u_new, T_fine);
+
+               }
+           }
+       }
+   }
+
+
+
+    for (Depth T: *sortedDepths){
 
          grid->WorkOnHangingNodes = true;
 
 
         u= 0.0;
         u.setMultiLevelValues2(P,T);
+        u_nodal=u;
+
+
+        NodalTransformationTest PrimTransform2(u_nodal,nodal_trafo);
+
+        for (int d=0; d<DimensionSparseGrid; d++)
+        {
+            if (restrictions[d])
+            {
+                u_nodal=0.0;
+                PrimTransform2.apply(u_nodal,T,d);
+            }
+        }
+
+        u=u_nodal;
+        if (T.at(0)==3 && T.at(1)==3)
+        {
+            T.Print();
+            u.PrintDouble(4);
+        }
+
 
         z = 0.0;
 
@@ -1057,7 +1456,9 @@ void MatrixVectorHomogen::caseFunction(VectorSparseG &prew, bool *restrictions, 
 
 #endif
 
+
        z.addMultiLevelValues2(gM,T);
+
 
 
 
@@ -1076,7 +1477,12 @@ void MatrixVectorHomogen::caseFunction(VectorSparseG &prew, bool *restrictions, 
 
 
 
+
+
        grid->WorkOnHangingNodes=false;
+
+
+
 
        if(depthList.isIncluded(Tcoarse))   ConvertToPrewavelet2(z, Ax_neu, Tcoarse);
 
@@ -1088,7 +1494,6 @@ void MatrixVectorHomogen::caseFunction(VectorSparseG &prew, bool *restrictions, 
 
 
 };
-
 
 
 
@@ -1158,12 +1563,6 @@ void MatrixVectorHomogen::applyStencilGlobal_symmetry(VectorSparseG &input, Vect
 depths.push_back(T);
 
 
-
-
-
-    AdaptiveSparseGrid_Base *grid = input.getSparseGrid();
-    int rank = 0;
-
             Depth Tlocal = T;
 
             ++Tlocal;
@@ -1178,9 +1577,8 @@ depths.push_back(T);
     for (size_t i = 0; i < end; i++) {
 
         CellDimension cellDimension = map.getIndexOfTable(i);
-
         matrixProblem.applyStencilOnCell(cellDimension, input, output);
-        //matrixProblem.applyStencilOnCell_MPI_OMP(cellDimension,input,output);
+
 
 
     }
