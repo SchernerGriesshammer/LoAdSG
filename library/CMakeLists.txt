@@ -42,7 +42,7 @@ endif (MPI_FOUND)
 if(MAIN_FILE)
     add_executable(${PROJECT_NAME} ${MAIN_FILE})
 else(MAIN_FILE)
-    add_executable(${PROJECT_NAME} "mainfiles/schroedinger_main/solve_schroedinger_hydro_simple.cpp")
+    add_executable(${PROJECT_NAME} "tests/gridgeneration.cpp")
 endif(MAIN_FILE)
 
 # "solve_he_params.cpp"
