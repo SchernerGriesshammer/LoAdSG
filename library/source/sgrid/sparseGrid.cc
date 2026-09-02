@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <sys/time.h>
+#include <chrono>
 
 using namespace std;
 
@@ -670,6 +671,33 @@ void AdaptiveSparseGrid::addHangingNodes() {
     }
 }
 
+void AdaptiveSparseGrid::addHangingNodes_fast() {
+    unsigned long maxocc = maximalOccupiedSecondTable;
+    for (unsigned long i = 0; i < maxocc; ++i) {
+        if (secondTable[i] != 0 && isActiveNodeTable[i]) {
+            IndexDimension I = getIndexOfTable(i);
+            Depth Tlocal(I);
+
+            for (MultiDimFiveCompass mc; mc.goon(); ++mc) {
+
+                IndexDimension J = I.nextFive(&mc, Tlocal);
+                unsigned long j;
+
+                if (!occupied(j, J))
+                    if (AddPoint(J)) {
+
+                        unsigned long k;
+                        if (occupied(k, J)) {
+                            isActiveNodeTable[k] = false;
+                        }
+
+                    }
+
+            }
+        }
+    }
+}
+
 
 
 int AdaptiveSparseGrid::getDOFS() {
@@ -825,18 +853,80 @@ void AdaptiveSparseGrid::completeDirichletGrid() {
 
     completeGridWithoutBoundary();
 
-   CompleteToLocalTensorProductGrid();
+    CompleteToLocalTensorProductGrid();
 
 
-       completeGridWithoutBoundary();
+    completeGridWithoutBoundary();
 
 
-       addHangingNodes();
+    addHangingNodes();
 
-       addPoints2(*this);
+    addPoints2(*this);
 
 
 
+}
+
+void AdaptiveSparseGrid::completeDirichletGrid_timed() {
+    using clock = std::chrono::high_resolution_clock;
+    auto ms = [](clock::time_point a, clock::time_point b) {
+        return std::chrono::duration<double, std::milli>(b - a).count();
+    };
+
+    auto t0 = clock::now();
+    completeGridWithoutBoundary();
+    auto t1 = clock::now();
+    CompleteToLocalTensorProductGrid();
+    auto t2 = clock::now();
+    completeGridWithoutBoundary();
+    auto t3 = clock::now();
+    addHangingNodes();
+    auto t4 = clock::now();
+    addPoints2(*this);
+    auto t5 = clock::now();
+
+    cout << "completeDirichletGrid_timed:" << endl;
+    cout << "  completeGridWithoutBoundary (1st): " << ms(t0, t1) << " ms" << endl;
+    cout << "  CompleteToLocalTensorProductGrid:   " << ms(t1, t2) << " ms" << endl;
+    cout << "  completeGridWithoutBoundary (2nd):  " << ms(t2, t3) << " ms" << endl;
+    cout << "  addHangingNodes:                    " << ms(t3, t4) << " ms" << endl;
+    cout << "  addPoints2:                          " << ms(t4, t5) << " ms" << endl;
+    cout << "  TOTAL:                               " << ms(t0, t5) << " ms" << endl;
+}
+
+void AdaptiveSparseGrid::completeDirichletGrid_fast() {
+    completeGridWithoutBoundary();
+    CompleteToLocalTensorProductGrid_fast();
+    completeGridWithoutBoundary();
+    addHangingNodes_fast();
+    addPoints2(*this);
+}
+
+void AdaptiveSparseGrid::completeDirichletGrid_fast_timed() {
+    using clock = std::chrono::high_resolution_clock;
+    auto ms = [](clock::time_point a, clock::time_point b) {
+        return std::chrono::duration<double, std::milli>(b - a).count();
+    };
+
+    auto t0 = clock::now();
+    completeGridWithoutBoundary();
+    auto t1 = clock::now();
+    CompleteToLocalTensorProductGrid_fast();
+    auto t2 = clock::now();
+    completeGridWithoutBoundary();
+    auto t3 = clock::now();
+    addHangingNodes_fast();
+    auto t4 = clock::now();
+    addPoints2(*this);
+    auto t5 = clock::now();
+
+    cout << "completeDirichletGrid_fast_timed:" << endl;
+    cout << "  completeGridWithoutBoundary (1st):     " << ms(t0, t1) << " ms" << endl;
+    cout << "  CompleteToLocalTensorProductGrid_fast:  " << ms(t1, t2) << " ms" << endl;
+    cout << "  completeGridWithoutBoundary (2nd):      " << ms(t2, t3) << " ms" << endl;
+    cout << "  addHangingNodes_fast:                   " << ms(t3, t4) << " ms" << endl;
+    cout << "  addPoints2:                              " << ms(t4, t5) << " ms" << endl;
+    cout << "  TOTAL:                                   " << ms(t0, t5) << " ms" << endl;
 }
 
 

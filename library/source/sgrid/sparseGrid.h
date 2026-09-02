@@ -358,6 +358,12 @@ class AdaptiveSparseGrid : public AdaptiveSparseGrid_Base {
 
     virtual void completeDirichletGrid();
 
+    void completeDirichletGrid_timed();
+
+    void completeDirichletGrid_fast();
+
+    void completeDirichletGrid_fast_timed();
+
     virtual void   completeDirichletGrid_NEU();
 
 
@@ -380,8 +386,12 @@ private:
      * Einfachere Methode als CompleteToLocalTensorProductGrid(). Überprüft Definition. */
     void CompleteToLocalTensorProductGrid();
 
+    void CompleteToLocalTensorProductGrid_fast();
+
     void CompleteToLocalTensorProductGrid_NEU(ListOfDepthOrderedSubgrids* listOfDepthOrderedSubgrids);
     void addHangingNodes();
+
+    void addHangingNodes_fast();
 
 
 

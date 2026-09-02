@@ -45,6 +45,8 @@ public:
 
     unsigned long findAnichtWithDepth(unsigned long iNow, Depth &T_);
 
+    unsigned long findAnichtWithDepthFast(unsigned long iNow, Depth &T_);
+
     /**
      * setzt Maximum und Minimum der Komponente
      * @param iNow mit einer nicht Markierung

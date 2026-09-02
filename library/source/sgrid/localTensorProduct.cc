@@ -14,6 +14,7 @@
 #include "ListOfDepthOrderedGrids.h"
 #include <iostream>
 #include <omp.h>
+#include <algorithm>
 
 #include "localTensorProduct.h"
 
@@ -60,6 +61,27 @@ unsigned long LocalForTensor::findAnichtWithDepth(unsigned long iNow, Depth &T_)
 /*        for(unsigned long i=0;i<iMax;++i) {
             if(marker[i]==nicht) return i;
         }*/
+    return iMax; // also nichts gefunden
+}
+
+unsigned long LocalForTensor::findAnichtWithDepthFast(unsigned long iNow, Depth &T_) {
+    unsigned long iMax = grid->getMaximalOccupiedSecondTable();
+
+    SingleDepthHashGrid &depthGrid = grid->getMultiDepthHashGrid()->getGridForDepth(T_);
+    const std::vector<unsigned long> &mapping = depthGrid._mapPosToGridPos;
+
+    // iNow == (unsigned long)-1 is the sentinel for "start a new search"; every other
+    // value is a previously returned index, so we resume right after it.
+    auto it = (iNow == static_cast<unsigned long>(-1))
+                  ? mapping.begin()
+                  : std::upper_bound(mapping.begin(), mapping.end(), iNow);
+
+    for (; it != mapping.end(); ++it) {
+        unsigned long i = *it;
+        if (marker[i] == nicht && grid->getActiveTable()[i]) {
+            return i;
+        }
+    }
     return iMax; // also nichts gefunden
 }
 
@@ -223,6 +245,49 @@ void AdaptiveSparseGrid::CompleteToLocalTensorProductGrid() {
 
             constructorTensor.checkStorage();
             iNow = constructorTensor.findAnichtWithDepth(iNow, T);
+
+        }
+
+
+    } while (outerIterationsSubgrids.next());
+
+
+}
+
+
+void AdaptiveSparseGrid::CompleteToLocalTensorProductGrid_fast() {
+
+    //1. Start
+    LocalForTensor constructorTensor(this);
+
+
+    ListOfDepthOrderedSubgrids orderedSubgrids(*this);
+    ListOfDepthOrderedSubgrids::iterator outerIterationsSubgrids(orderedSubgrids);
+    outerIterationsSubgrids.gotoBegin();
+
+
+
+    //Gehe alle Tiefen von Coarse to Fine durch
+    do {
+
+        Depth T = outerIterationsSubgrids.getSubgrid()->getT();
+
+
+        unsigned long iNow = constructorTensor.findAnichtWithDepthFast(-1, T);
+        while (iNow < maximalOccupiedSecondTable) {
+
+
+            IndexDimension indexNow = constructorTensor.StartSearchComponent(iNow);
+
+
+            // Zusammenhangskomponente wird untersucht und bereits vorhandene Punkte auf arbeite gesetzt
+            constructorTensor.recursiveMarkArbeite2(indexNow, iNow);
+
+            constructorTensor.checkRechteck(indexNow);
+
+
+            constructorTensor.checkStorage();
+            iNow = constructorTensor.findAnichtWithDepthFast(iNow, T);
 
         }
 
