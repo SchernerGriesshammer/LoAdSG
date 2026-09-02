@@ -1,6 +1,7 @@
+#include <filesystem>
 #include <iomanip>
 
-#include "source/sparseEXPDE.h"
+#include "../source/sparseEXPDE.h"
 
 
 class NodalTransformation
@@ -219,103 +220,204 @@ void tensor(Depth TX, Depth TY, AdaptiveSparseGrid& grid)
     }
 }
 
-double var_coeff( double* x)
+
+//hydrogen values
+double border = 7.5;
+//3e-9;
+//8e-10;
+
+double eps = 1e-10;
+double cg_eps = 1e-10;
+
+
+const double CUTCOEFF = 1e6;
+
+const int mc_samples = 200;
+
+
+
+const double varc_factor = -8.0*border;
+
+const double rhs_factor = 8.0*border*border;
+
+const double eig_exp = -0.5;//*rhs_factor;
+const double shiftfactor =0.9;
+const double shiftvalue = (shiftfactor+1.0) * (-1.0) * eig_exp*rhs_factor;
+
+
+volatile double r_min = 1;
+volatile double r_max = 1;
+
+double alpha = 1.0;
+
+
+
+double var_coeff( double* coordinates)
 {
-    const double sum = (x[0]*x[0])+(x[1]*x[1])+(x[2]*x[2]);
-    return 1.0/sum;
+    double r = 0;
+    for (int i = 0; i < DimensionSparseGrid; i++) {
+        double ci = 2. * coordinates[i] - 1.; // < map from [0,1] to [-s,s]
+        r += ci * ci;
+    }
+
+    r = sqrt(r);
+
+
+    double result = CUTCOEFF;
+    if (r!=0){
+        result = min(1. / r, CUTCOEFF); // < clipping large values of 1/r around the center
+    }
+
+    result = varc_factor * result;
+    //result -= 1.9*eig_exp; // + 1.9*1*4*s^2 (eig_exp==1)
+    result += shiftvalue;
+
+
+    // log range of sampled values
+    double over_r = (r!=0) ? 1./r : 1;
+    if (alpha==1 && over_r < r_min) r_min = over_r;
+    if (alpha==1 && over_r > r_max) r_max = over_r;
+
+
+
+    return alpha*result;
 }
 
 
 
 int main(int argc, char **argv) {
 
+    int rank = 0;
+    int num_tasks = 1;
+
+
 #ifdef MY_MPI_ON
-    int rank, num_tasks;
     MPI_Init(&argc,&argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &num_tasks);
 #endif
 
 
+
+    int numberMVprocesses=4;
+    int numberLSprocesses=num_tasks - numberMVprocesses;
+
+
     AdaptiveSparseGrid regular_grid;
-    AdaptiveSparseGrid grid2;
-
-    cout << DimensionSparseGrid    <<endl;
-
-    int d = 6;
 
 
     IndexDimension centerPoint;
 
-    regular_grid.AddPoint(centerPoint.leftSon(0).leftSon(0));
-    regular_grid.completeDirichletGrid();
-    regular_grid.PrintActiveHanging(4);
+    regular_grid.AddRecursiveSonsOfPoint(centerPoint,5);
 
-    VectorSparseG u(regular_grid),v(regular_grid);
-    u=1.0;
-    calcNodalByPrew(u,v);
-    u=0.0;
-    v.PrintDouble(3);
-    calcPrewByNodal(u,v);
-
-    u.PrintDouble(3);
+    VectorSparseG x(regular_grid),Ax(regular_grid),Bx(regular_grid);
 
 
-    return 0;
-    grid2.AddRecursiveSonsOfPoint(centerPoint,6);
 
-    int size=grid2.getMaximalOccupiedSecondTable();
+
+    int size = regular_grid.getDOFS();
 
     MultiLevelAdaptiveSparseGrid mgrid(&regular_grid);
-    MatrixVectorHomogen m(regular_grid,mgrid,true,false);
-    Poisson stencilPoisson(regular_grid);
+    MatrixVectorHomogen m(regular_grid,mgrid,true,true);
 
 
-    VariableCoefficientMass helm_holtz(regular_grid);
+    double mAx[size][size];
+    double diagA[size][size];
+    double mBx[size][size];
+    double diagB[size][size];
 
-    double matrix[size][size];
-    VectorSparseG x(regular_grid);
-    VectorSparseG b(regular_grid);
 
-    calcPrewByNodal(x,b);
+    Poisson poisson(regular_grid);
+    HelmHoltz rhs(regular_grid);
 
-    for (unsigned long k=0; k<grid2.getMaximalOccupiedSecondTable();k++)
+    StencilMC<double (*)(double *)> stencilVarCoeff(regular_grid,&var_coeff,mc_samples);
+    LocalStiffnessMatricesDynamicDistribution lhs(regular_grid, stencilVarCoeff,numberLSprocesses);
+    lhs.addStencil(poisson);
+
+    for (unsigned long k=0; k<regular_grid.getMaximalOccupiedSecondTable();k++)
     {
-        IndexDimension p=grid2.getIndexOfTable(k);
+        IndexDimension p=regular_grid.getIndexOfTable(k);
         x.setValue(p,1.0);
 
-        m.multiplication(x,b,helm_holtz);
-        for (unsigned long j=0;j< grid2.getMaximalOccupiedSecondTable();j++)
-        {
-            IndexDimension q=grid2.getIndexOfTable(j);
 
-            matrix[k][j]=b.getValue(q);
+        m.multiplication(x,Ax,lhs);
+        for (unsigned long j=0;j< regular_grid.getMaximalOccupiedSecondTable();j++)
+        {
+            IndexDimension q=regular_grid.getIndexOfTable(j);
+
+            mAx[k][j]=Ax.getValue(q);
         }
 
+        diagA[k][k]=1.0/mAx[k][k];
+
+
+
         x=0.0;
-        b=0.0;
+        Ax=0.0;
 
     }
 
 
+    for (unsigned long k=0; k<regular_grid.getMaximalOccupiedSecondTable();k++)
+    {
+        IndexDimension p=regular_grid.getIndexOfTable(k);
+        x.setValue(p,1.0);
 
-    std::ofstream datei("matrix_data_helmsparse7.txt");
+        m.multiplication(x,Bx,rhs);
+        for (unsigned long j=0;j< regular_grid.getMaximalOccupiedSecondTable();j++)
+        {
+            IndexDimension q=regular_grid.getIndexOfTable(j);
+
+            mBx[k][j]=Bx.getValue(q);
+        }
+
+        diagB[k][k]=1.0/mBx[k][k];
+
+
+
+        x=0.0;
+        Bx=0.0;
+
+    }
+
+if (rank==0)
+{
+    std::ofstream datei("mAneu5mc200cc6.txt");
 
     if (datei.is_open()) {
         // Hohe Präzision sicherstellen, damit double-Werte nicht gerundet werden
         datei << std::setprecision(15);
 
-        for (int i = 0; i < grid2.getMaximalOccupiedSecondTable(); ++i) {
-            for (int j = 0; j < grid2.getMaximalOccupiedSecondTable(); ++j) {
-                datei << matrix[i][j];
-                if (j < grid2.getMaximalOccupiedSecondTable() - 1) datei << " "; // Leerzeichen zwischen Spalten
+        for (int i = 0; i < regular_grid.getMaximalOccupiedSecondTable(); ++i) {
+            for (int j = 0; j < regular_grid.getMaximalOccupiedSecondTable(); ++j) {
+                datei << mAx[i][j];
+                if (j < regular_grid.getMaximalOccupiedSecondTable() - 1) datei << " "; // Leerzeichen zwischen Spalten
             }
             datei << "\n"; // Zeilenumbruch nach jeder Zeile
         }
         datei.close();
-        std::cout << "Matrix erfolgreich gespeichert." << std::endl;
+        std::cout << "Matrix  A erfolgreich gespeichert." << std::endl;
     }
 
+
+
+    std::ofstream datei_B("mBneu5mc200cc6.txt");
+
+    if (datei_B.is_open()) {
+        // Hohe Präzision sicherstellen, damit double-Werte nicht gerundet werden
+        datei_B << std::setprecision(15);
+
+        for (int i = 0; i < regular_grid.getMaximalOccupiedSecondTable(); ++i) {
+            for (int j = 0; j < regular_grid.getMaximalOccupiedSecondTable(); ++j) {
+                datei_B << mBx[i][j];
+                if (j < regular_grid.getMaximalOccupiedSecondTable() - 1) datei_B << " "; // Leerzeichen zwischen Spalten
+            }
+            datei_B << "\n"; // Zeilenumbruch nach jeder Zeile
+        }
+        datei_B.close();
+        std::cout << "Matrix B erfolgreich gespeichert." << std::endl;
+    }
+}
     
 
 

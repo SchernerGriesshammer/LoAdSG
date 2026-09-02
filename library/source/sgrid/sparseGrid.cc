@@ -826,7 +826,7 @@ void AdaptiveSparseGrid::completeDirichletGrid() {
     completeGridWithoutBoundary();
 
    CompleteToLocalTensorProductGrid();
-    return;
+
 
        completeGridWithoutBoundary();
 

@@ -15,13 +15,17 @@ class StencilMC: public StencilTemplate{
 
 public:
 
-    StencilMC(AdaptiveSparseGrid& grid_, const F &varCoeff_, int c_) : StencilTemplate(grid_), varCoeff(varCoeff_), c(c_){
+    StencilMC(AdaptiveSparseGrid& grid_, const F &varCoeff_, int c_,int seed_ = -1) : StencilTemplate(grid_), varCoeff(varCoeff_), c(c_){
         dofs=grid.getDOFS();
-        gen =std::mt19937(rd());
+        unsigned int actualSeed = (seed_ >= 0) ? 
+                              static_cast<unsigned int>(seed_) : rd();
+    
+    gen = std::mt19937(actualSeed);
     };
 
 
     int c=1;
+    int c_center=10;
 
 
     inline double integration(CellDimension& cell, CellIndexDirection& dirP, CellIndexDirection& dirQ){
@@ -44,6 +48,17 @@ public:
         else numberMC= dofs/vol_cell;
 
         numberMC*=c;
+
+
+        for (int d=0; d<DimensionSparseGrid;d++)
+        {
+            if (cell.getLeftBoundary(d)==0.5 || cell.getRightBoundary(d)==0.5)
+            {
+                numberMC*=c_center;
+                break;
+
+            }
+        }
 
 
 
