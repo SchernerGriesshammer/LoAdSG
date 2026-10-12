@@ -1,0 +1,7 @@
+<map id="AdaptiveSparseGrid_Base::getFreeSpaceNumberInSecondTable" name="AdaptiveSparseGrid_Base::getFreeSpaceNumberInSecondTable">
+<area shape="rect" id="Node000001" title=" " alt="" coords="459,5,680,60"/>
+<area shape="rect" id="Node000002" href="$class_adaptive_sparse_grid.html#a504643e907d58651c282fdae1dfbce82" title=" " alt="" coords="260,13,411,53"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="445,35,411,35,411,30,445,30"/>
+<area shape="rect" id="Node000003" href="$class_local_for_tensor.html#ab4669b714194cdc7e14317f2b80d0d32" title=" " alt="" coords="5,13,212,53"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="246,35,212,35,212,30,246,30"/>
+</map>

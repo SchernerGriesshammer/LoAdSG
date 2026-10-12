@@ -1,0 +1,5 @@
+<map id="SimpleMultiHash::checkIfItemInHashgroup" name="SimpleMultiHash::checkIfItemInHashgroup">
+<area shape="rect" id="Node000001" title="Will try to find the given item in the Hashgroup." alt="" coords="252,5,440,45"/>
+<area shape="rect" id="Node000002" href="$class_simple_multi_hash.html#a09e5cb8f490ac19681983c4ab7b718e2" title="Will add the given point to the MultiHash. If the same point already exists it will not be added." alt="" coords="5,13,204,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="238,28,204,28,204,23,238,23"/>
+</map>

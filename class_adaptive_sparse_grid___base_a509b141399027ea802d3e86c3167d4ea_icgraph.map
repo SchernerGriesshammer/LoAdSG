@@ -1,0 +1,21 @@
+<map id="AdaptiveSparseGrid_Base::getIndexOfTable" name="AdaptiveSparseGrid_Base::getIndexOfTable">
+<area shape="rect" id="Node000001" title=" " alt="" coords="561,101,736,141"/>
+<area shape="rect" id="Node000002" href="$class_adaptive_sparse_grid.html#a504643e907d58651c282fdae1dfbce82" title=" " alt="" coords="337,21,488,61"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="575,99,472,64,473,59,576,94"/>
+<area shape="rect" id="Node000004" href="$class_adaptive_sparse_grid___base.html#af33a2f3dd5047fc4731fa952308ce258" title=" " alt="" coords="337,101,488,141"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="548,124,488,124,488,119,548,119"/>
+<area shape="rect" id="Node000008" href="$class_local_for_tensor.html#a2f05581b921bb72766d79e3e5b1bd080" title=" " alt="" coords="312,209,513,249"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="593,149,459,212,456,207,591,145"/>
+<area shape="rect" id="Node000003" href="$class_local_for_tensor.html#ab4669b714194cdc7e14317f2b80d0d32" title=" " alt="" coords="31,5,238,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="324,39,238,34,238,29,324,34"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="357,98,263,60,224,48,225,43,265,55,359,93"/>
+<area shape="rect" id="Node000005" href="$class_adaptive_sparse_grid___base.html#afba92ad8bd28d0571f67e7d17b05e86c" title="prints active nodes (o) and hanging nodes (x)" alt="" coords="37,69,232,109"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="323,114,232,103,232,98,324,108"/>
+<area shape="rect" id="Node000006" href="$class_adaptive_sparse_grid___base.html#a9bead8f303d386701aeb525e25598e92" title="prints all nodes and highlights given Indices" alt="" coords="49,133,221,173"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="324,134,221,146,221,141,324,129"/>
+<area shape="rect" id="Node000007" href="$class_local_for_tensor.html#a830794e25eec3463dcd234cfdd55efa2" title=" " alt="" coords="41,221,228,261"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="354,149,183,224,181,219,352,144"/>
+<area shape="poly" id="edge8_Node000007_Node000007" title=" " alt="" coords="182,210,165,203,135,200,108,202,91,207,85,213,88,220,83,222,80,212,89,202,107,197,135,195,167,197,184,205"/>
+<area shape="rect" id="Node000009" href="$class_adaptive_sparse_grid.html#a3ca486072a975bdf7726d6cbf9bec038" title="‍adds all father points including boundary points" alt="" coords="5,285,264,325"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="334,256,265,276,219,288,218,283,263,271,333,251"/>
+</map>
