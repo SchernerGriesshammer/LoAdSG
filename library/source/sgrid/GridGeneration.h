@@ -15,8 +15,13 @@ Depth max(Depth& TP, Depth& TQ);
 
 bool refill(AdaptiveSparseGrid& grid, IndexDimension P, IndexDimension Q, Depth T, unsigned long p, unsigned long q);
 bool refill_NEU(AdaptiveSparseGrid& grid, IndexDimension P, IndexDimension Q, Depth T, unsigned long p, unsigned long q, std::vector<IndexDimension>& pointsToAdd);
+bool refill_v2(AdaptiveSparseGrid& grid, IndexDimension P, IndexDimension Q, Depth T, unsigned long p, unsigned long q);
+bool refill_NEU_v2(AdaptiveSparseGrid& grid, IndexDimension P, IndexDimension Q, Depth T, unsigned long p, unsigned long q, std::vector<IndexDimension>& pointsToAdd);
 void addPoints(AdaptiveSparseGrid& dGrid);
 void addPoints2(AdaptiveSparseGrid& dGrid);
+void addPoints2_omp(AdaptiveSparseGrid& dGrid);
+void addPoints2_v2(AdaptiveSparseGrid& dGrid);
+void addPoints2_omp_v2(AdaptiveSparseGrid& dGrid);
 
 
 void addPoints2_NEU(AdaptiveSparseGrid& dGrid, DepthList list);

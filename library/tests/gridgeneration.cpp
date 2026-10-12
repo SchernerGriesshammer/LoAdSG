@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <iomanip>
+#include <omp.h>
 
 #include "../source/sparseEXPDE.h"
 
@@ -108,20 +109,40 @@ int main(int argc, char **argv) {
     IndexDimension leftCenter=centerPoint;
     for (int d=0; d<DimensionSparseGrid; ++d)
     {
-        leftCenter = leftCenter.leftSon(d);
+        leftCenter = leftCenter.leftSon(d).leftSon(d).leftSon(d).leftSon(d);
     }
 
     IndexDimension rightCenter=centerPoint;
     for (int d=0; d<DimensionSparseGrid; ++d)
     {
-        rightCenter = rightCenter.rightSon(d);
+    rightCenter = rightCenter.rightSon(d).rightSon(d).rightSon(d).rightSon(d);
     }
 
 
     grid.AddPoint(leftCenter);
     grid.AddPoint(rightCenter);
 
+
+
     grid.completeDirichletGrid();
+
+
+    cout << "active nodes " <<endl;
+    for (unsigned long k=0; k< grid.getMaximalOccupiedSecondTable(); k++)
+    {
+        IndexDimension I = grid.getIndexOfTable(k);
+        if (grid.getActiveTable()[k]) I.PrintCoord();
+    }
+
+    cout << endl;
+    cout << " hanging nodes " << endl;
+    for (unsigned long k=0; k < grid.getMaximalOccupiedSecondTable(); k++)
+    {
+        IndexDimension I = grid.getIndexOfTable(k);
+        if (!grid.getActiveTable()[k]) I.PrintCoord();
+    }
+
+    exit(1);
 
 
     AdaptiveSparseGrid grid_test;
@@ -129,7 +150,7 @@ int main(int argc, char **argv) {
     grid_test.AddPoint(leftCenter);
     grid_test.AddPoint(rightCenter);
 
-    grid_test.completeDirichletGrid_timed();
+    //grid_test.completeDirichletGrid_timed();
 
 
     bool similar = gridsAreSimilar(grid, grid_test, false);
@@ -141,12 +162,45 @@ int main(int argc, char **argv) {
     grid_fast.AddPoint(leftCenter);
     grid_fast.AddPoint(rightCenter);
 
-    grid_fast.completeDirichletGrid_fast_timed();
+    //grid_fast.completeDirichletGrid_fast_timed();
 
     bool fastSimilar = gridsAreSimilar(grid, grid_fast, false);
     cout << "grid and grid_fast are " << (fastSimilar ? "similar" : "not similar") << endl;
 
+    AdaptiveSparseGrid grid_omp;
 
+    grid_omp.AddPoint(leftCenter);
+    grid_omp.AddPoint(rightCenter);
+
+    cout << "OMP max threads: " << omp_get_max_threads() << endl;
+
+    grid_omp.completeDirichletGrid_omp_timed();
+
+    bool ompSimilar = gridsAreSimilar(grid, grid_omp, false);
+    cout << "grid and grid_omp are " << (ompSimilar ? "similar" : "not similar") << endl;
+    cout << "grid_omp number of grid points " << grid_omp.getDOFS() << " " << grid_omp.getHangingNodes() << endl;
+
+    AdaptiveSparseGrid grid_v2;
+
+    grid_v2.AddPoint(leftCenter);
+    grid_v2.AddPoint(rightCenter);
+
+    //grid_v2.completeDirichletGrid_v2_timed();
+
+    bool v2Similar = gridsAreSimilar(grid_omp, grid_v2, false);
+    cout << "grid and grid_v2 are " << (v2Similar ? "similar" : "not similar") << endl;
+    cout << "grid_v2 number of grid points " << grid_v2.getDOFS() << " " << grid_v2.getHangingNodes() << endl;
+
+    AdaptiveSparseGrid grid_omp_v2;
+
+    grid_omp_v2.AddPoint(leftCenter);
+    grid_omp_v2.AddPoint(rightCenter);
+
+    grid_omp_v2.completeDirichletGrid_omp_v2_timed();
+
+    bool ompV2Similar = gridsAreSimilar(grid_omp, grid_omp_v2, false);
+    cout << "grid and grid_omp_v2 are " << (ompV2Similar ? "similar" : "not similar") << endl;
+    cout << "grid_omp_v2 number of grid points " << grid_omp_v2.getDOFS() << " " << grid_omp_v2.getHangingNodes() << endl;
 
     return 0;
 }

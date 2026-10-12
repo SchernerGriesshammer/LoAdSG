@@ -291,6 +291,8 @@ int main(int argc, char **argv) {
             u_noalph.setValue(i,laplace_sin(I));
         }
         calcPrewByNodal(prew_u_noalph, u_noalph);
+
+
         HelmHoltz rhs_noalph(grid);
         Poisson lhs_noalph(grid);
         double ev_noalph_mult = Power::eigenvalue_exp<Poisson,HelmHoltz>(m, lhs_noalph, rhs_noalph, prew_u_noalph, grid);

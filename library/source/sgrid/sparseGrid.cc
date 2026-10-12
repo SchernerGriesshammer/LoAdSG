@@ -929,6 +929,111 @@ void AdaptiveSparseGrid::completeDirichletGrid_fast_timed() {
     cout << "  TOTAL:                                   " << ms(t0, t5) << " ms" << endl;
 }
 
+void AdaptiveSparseGrid::completeDirichletGrid_omp() {
+    completeGridWithoutBoundary();
+    CompleteToLocalTensorProductGrid_fast();
+    completeGridWithoutBoundary();
+    addHangingNodes_fast();
+    addPoints2_omp(*this);
+}
+
+void AdaptiveSparseGrid::completeDirichletGrid_omp_timed() {
+    using clock = std::chrono::high_resolution_clock;
+    auto ms = [](clock::time_point a, clock::time_point b) {
+        return std::chrono::duration<double, std::milli>(b - a).count();
+    };
+
+    auto t0 = clock::now();
+    completeGridWithoutBoundary();
+    auto t1 = clock::now();
+    CompleteToLocalTensorProductGrid_fast();
+    auto t2 = clock::now();
+    completeGridWithoutBoundary();
+    auto t3 = clock::now();
+    addHangingNodes_fast();
+    auto t4 = clock::now();
+    addPoints2_omp(*this);
+    auto t5 = clock::now();
+
+    cout << "completeDirichletGrid_omp_timed:" << endl;
+    cout << "  completeGridWithoutBoundary (1st):     " << ms(t0, t1) << " ms" << endl;
+    cout << "  CompleteToLocalTensorProductGrid_fast:  " << ms(t1, t2) << " ms" << endl;
+    cout << "  completeGridWithoutBoundary (2nd):      " << ms(t2, t3) << " ms" << endl;
+    cout << "  addHangingNodes_fast:                   " << ms(t3, t4) << " ms" << endl;
+    cout << "  addPoints2_omp:                          " << ms(t4, t5) << " ms" << endl;
+    cout << "  TOTAL:                                   " << ms(t0, t5) << " ms" << endl;
+}
+
+void AdaptiveSparseGrid::completeDirichletGrid_v2() {
+    completeGridWithoutBoundary();
+    CompleteToLocalTensorProductGrid_fast();
+    completeGridWithoutBoundary();
+    addHangingNodes_fast();
+    addPoints2_v2(*this);
+}
+
+void AdaptiveSparseGrid::completeDirichletGrid_v2_timed() {
+    using clock = std::chrono::high_resolution_clock;
+    auto ms = [](clock::time_point a, clock::time_point b) {
+        return std::chrono::duration<double, std::milli>(b - a).count();
+    };
+
+    auto t0 = clock::now();
+    completeGridWithoutBoundary();
+    auto t1 = clock::now();
+    CompleteToLocalTensorProductGrid_fast();
+    auto t2 = clock::now();
+    completeGridWithoutBoundary();
+    auto t3 = clock::now();
+    addHangingNodes_fast();
+    auto t4 = clock::now();
+    addPoints2_v2(*this);
+    auto t5 = clock::now();
+
+    cout << "completeDirichletGrid_v2_timed:" << endl;
+    cout << "  completeGridWithoutBoundary (1st):     " << ms(t0, t1) << " ms" << endl;
+    cout << "  CompleteToLocalTensorProductGrid_fast:  " << ms(t1, t2) << " ms" << endl;
+    cout << "  completeGridWithoutBoundary (2nd):      " << ms(t2, t3) << " ms" << endl;
+    cout << "  addHangingNodes_fast:                   " << ms(t3, t4) << " ms" << endl;
+    cout << "  addPoints2_v2:                           " << ms(t4, t5) << " ms" << endl;
+    cout << "  TOTAL:                                   " << ms(t0, t5) << " ms" << endl;
+}
+
+void AdaptiveSparseGrid::completeDirichletGrid_omp_v2() {
+    completeGridWithoutBoundary();
+    CompleteToLocalTensorProductGrid_fast();
+    completeGridWithoutBoundary();
+    addHangingNodes_fast();
+    addPoints2_omp_v2(*this);
+}
+
+void AdaptiveSparseGrid::completeDirichletGrid_omp_v2_timed() {
+    using clock = std::chrono::high_resolution_clock;
+    auto ms = [](clock::time_point a, clock::time_point b) {
+        return std::chrono::duration<double, std::milli>(b - a).count();
+    };
+
+    auto t0 = clock::now();
+    completeGridWithoutBoundary();
+    auto t1 = clock::now();
+    CompleteToLocalTensorProductGrid_fast();
+    auto t2 = clock::now();
+    completeGridWithoutBoundary();
+    auto t3 = clock::now();
+    addHangingNodes_fast();
+    auto t4 = clock::now();
+    addPoints2_omp_v2(*this);
+    auto t5 = clock::now();
+
+    cout << "completeDirichletGrid_omp_v2_timed:" << endl;
+    cout << "  completeGridWithoutBoundary (1st):     " << ms(t0, t1) << " ms" << endl;
+    cout << "  CompleteToLocalTensorProductGrid_fast:  " << ms(t1, t2) << " ms" << endl;
+    cout << "  completeGridWithoutBoundary (2nd):      " << ms(t2, t3) << " ms" << endl;
+    cout << "  addHangingNodes_fast:                   " << ms(t3, t4) << " ms" << endl;
+    cout << "  addPoints2_omp_v2:                       " << ms(t4, t5) << " ms" << endl;
+    cout << "  TOTAL:                                   " << ms(t0, t5) << " ms" << endl;
+}
+
 
 
 void AdaptiveSparseGrid::completeDirichletGrid_NEU() {

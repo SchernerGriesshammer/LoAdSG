@@ -364,6 +364,18 @@ class AdaptiveSparseGrid : public AdaptiveSparseGrid_Base {
 
     void completeDirichletGrid_fast_timed();
 
+    void completeDirichletGrid_omp();
+
+    void completeDirichletGrid_omp_timed();
+
+    void completeDirichletGrid_v2();
+
+    void completeDirichletGrid_v2_timed();
+
+    void completeDirichletGrid_omp_v2();
+
+    void completeDirichletGrid_omp_v2_timed();
+
     virtual void   completeDirichletGrid_NEU();
 
 
