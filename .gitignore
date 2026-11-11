@@ -6,3 +6,6 @@ docs/html/
 docs/latex/
 
 library/completeDirichletGrid_optimizations.md
+
+.vscode/
+NOTES.md
