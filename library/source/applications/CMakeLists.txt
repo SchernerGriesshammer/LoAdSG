@@ -6,6 +6,8 @@ add_library(
 
         power_method.h
 
+        lobpcg.h lobpcg.cpp
+        dense_eigen.h jacobi_eigen.cpp
 
         cg_method.cpp cg_method.h
 
