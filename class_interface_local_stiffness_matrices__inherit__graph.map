@@ -1,0 +1,20 @@
+<map id="InterfaceLocalStiffnessMatrices&lt; DIM &gt;" name="InterfaceLocalStiffnessMatrices&lt; DIM &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,100,231,145"/>
+<area shape="rect" id="Node000002" href="$class_integrator_helm_constant.html" title=" " alt="" coords="370,5,548,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,93,326,60,372,50,368,52,327,65,212,98"/>
+<area shape="rect" id="Node000003" href="$class_integrator_poisson.html" title=" " alt="" coords="386,75,532,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="246,110,388,101,383,104,247,115"/>
+<area shape="rect" id="Node000004" href="$class_interface_local_stiffness_matrices.html" title=" " alt="" coords="327,143,592,171"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="246,138,255,139,329,148,323,149,254,145,247,144"/>
+<area shape="rect" id="Node000008" href="$class_interface_local_stiffness_matrices.html" title=" " alt="" coords="328,195,591,223"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="182,148,255,174,341,194,336,195,254,179,182,154"/>
+<area shape="rect" id="Node000005" href="$class_integrator_helm.html" title=" " alt="" coords="972,83,1142,127"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="568,136,591,129,615,115,640,102,725,86,793,84,861,90,948,96,974,99,969,99,948,101,861,95,793,89,726,91,642,108,618,120,593,134,570,141"/>
+<area shape="rect" id="Node000006" href="$class_integrator_helm.html" title="Integrator for the Helmholtz operator with variable coefficients." alt="" coords="644,116,820,144"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="607,140,646,139,641,139,608,145"/>
+<area shape="rect" id="Node000007" href="$class_integrator_r_h_s.html" title="Integrator for the Helmholtz operator with variable coefficients." alt="" coords="648,168,816,196"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="607,168,650,174,645,175,607,173"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="835,127,947,121,974,120,969,121,948,126,836,132"/>
+<area shape="rect" id="Node000009" href="$class_integrator_poisson_curved.html" title=" " alt="" coords="641,220,823,248"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="606,220,644,226,638,226,606,225"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="IntegratorHelm&lt; F, N &gt;" name="IntegratorHelm&lt; F, N &gt;">
+<area shape="rect" id="Node000001" title="Integrator for the Helmholtz operator with variable coefficients." alt="" coords="50,200,226,228"/>
+<area shape="rect" id="Node000004" href="$class_integrator_helm.html" title=" " alt="" coords="53,301,223,345"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="140,242,141,301,135,299,136,245"/>
+<area shape="rect" id="Node000002" href="$class_interface_local_stiffness_matrices.html" title=" " alt="" coords="5,123,271,151"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,164,141,200,135,199,137,169"/>
+<area shape="rect" id="Node000003" href="$class_interface_local_stiffness_matrices.html" title=" " alt="" coords="25,5,251,50"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="139,63,141,123,135,122,137,68"/>
+</map>

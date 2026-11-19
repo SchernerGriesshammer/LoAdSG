@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$class_interface_local_stiffness_matrices.html" title=" " alt="" coords="5,74,271,102"/>
+<area shape="rect" id="Node000001" href="$class_integrator_helm.html" title=" " alt="" coords="322,5,492,50"/>
+<area shape="poly" id="edge5_Node000000_Node000001" title=" " alt="" coords="217,67,324,46,319,48,219,73"/>
+<area shape="rect" id="Node000002" href="$class_integrator_helm.html" title="Integrator for the Helmholtz operator with variable coefficients." alt="" coords="319,74,495,102"/>
+<area shape="poly" id="edge6_Node000000_Node000002" title=" " alt="" coords="286,85,321,87,316,88,287,90"/>
+<area shape="rect" id="Node000003" href="$class_integrator_r_h_s.html" title="Integrator for the Helmholtz operator with variable coefficients." alt="" coords="323,126,491,154"/>
+<area shape="poly" id="edge7_Node000000_Node000003" title=" " alt="" coords="229,102,334,125,329,126,228,108"/>
+</map>

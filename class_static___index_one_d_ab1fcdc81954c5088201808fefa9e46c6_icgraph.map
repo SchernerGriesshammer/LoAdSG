@@ -1,0 +1,11 @@
+<map id="Static_IndexOneD::nextRight" name="Static_IndexOneD::nextRight">
+<area shape="rect" id="Node000001" title=" " alt="" coords="457,66,665,94"/>
+<area shape="rect" id="Node000002" href="$class_index_one_d.html#a5a6d82139cc36cf8eee343a77342420d" title="next right index on same level" alt="" coords="223,14,387,42"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="472,62,377,45,377,40,477,62"/>
+<area shape="rect" id="Node000004" href="$class_index_one_d.html#a66e2e8e5127513039e72432c3a19e35c" title=" " alt="" coords="223,66,387,94"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="439,80,388,82,387,77,444,79"/>
+<area shape="rect" id="Node000005" href="$class_static___index_one_d.html#a9fb41b72b80f6a6691ba9ed8bc606fc3" title=" " alt="" coords="201,118,409,146"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="477,97,377,120,376,115,472,97"/>
+<area shape="rect" id="Node000003" href="$class_rectangular_iterator.html#a2920d9dd7f8880210cacb5b000e6d2cf" title=" " alt="" coords="5,5,153,50"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="205,29,154,30,152,25,210,27"/>
+</map>

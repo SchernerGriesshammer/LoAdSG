@@ -1,0 +1,11 @@
+<map id="MatrixVectorHomogen::prolongation1D_inplace" name="MatrixVectorHomogen::prolongation1D_inplace">
+<area shape="rect" id="Node000001" title=" " alt="" coords="480,83,663,127"/>
+<area shape="rect" id="Node000002" href="$class_matrix_vector_homogen.html#a4c725a54e6d5244a65c9239090741244" title=" " alt="" coords="243,5,410,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="481,78,399,53,400,48,486,77"/>
+<area shape="rect" id="Node000004" href="$class_matrix_vector_homogen.html#ac07e690b6633fc489148ee13666d528e" title=" " alt="" coords="221,74,432,136"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="462,105,433,108,432,102,467,105"/>
+<area shape="rect" id="Node000005" href="$class_matrix_vector_homogen.html#a3c26583b07639fa30c31274231526e52" title=" " alt="" coords="243,160,410,205"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="486,132,400,162,399,157,481,133"/>
+<area shape="rect" id="Node000003" href="$class_matrix_vector_homogen.html#a09d9521f43e0f1e2e7db89370648b248" title="Distribute the cases with dynamic mpi_scheduling." alt="" coords="5,5,173,50"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="225,29,174,30,172,25,230,26"/>
+</map>
