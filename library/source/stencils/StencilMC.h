@@ -23,6 +23,33 @@ public:
     gen = std::mt19937(actualSeed);
     };
 
+    /// @name Enrichment (see source/enrichment)
+    /// @{
+
+    /**
+     * @brief Integrand of the coupling entry \f$\int\kappa\,\varphi_p\,g\,dx\f$ at the point \p x
+     *        (\f$\kappa\f$ = varCoeff, the same coefficient as in the local stiffness matrices).
+     * @tparam Phi prewavelet type (Prewavelet), needs `value(const double*)`
+     * @tparam G enrichment function, needs `value(const double*)`
+     * @ingroup enrichment
+     */
+    template<class Phi, class G>
+    inline double enrich_integrand(const Phi &phi, const G &g, double *x) {
+        return varCoeff(x) * phi.value(x) * g.value(x);
+    }
+
+    /**
+     * @brief Integrand of \f$\int\kappa\,v\,w\,dx\f$ at the point \p x (bilinear form of two functions).
+     * @tparam V function with `value(const double*)`
+     * @tparam W function with `value(const double*)`
+     * @ingroup enrichment
+     */
+    template<class V, class W>
+    inline double enrich_integrand_pair(const V &v, const W &w, double *x) {
+        return varCoeff(x) * v.value(x) * w.value(x);
+    }
+    /// @}
+
 
     int c=1;
     int c_center=10;

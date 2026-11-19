@@ -8,7 +8,7 @@
 #ifndef ABBREVI_H
 #define ABBREVI_H
 
-#define DimensionSparseGrid 2
+#define DimensionSparseGrid 3
 #define MaximumDepth       15
 
 #define indexInteger   int              // this should be signed, since cacluations require that 

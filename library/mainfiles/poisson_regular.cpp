@@ -36,13 +36,13 @@ int main(int argc, char **argv) {
     IndexDimension centerPoint;
 
 
-    for (int level = 3; level < 10; level++)
+    for (int level = 3; level < 11; level++)
     {
 
 
         AdaptiveSparseGrid grid;
         grid.AddRecursiveSonsOfPoint(centerPoint,level);
-        grid.PrintActiveHanging(4);
+
         
 
         MultiLevelAdaptiveSparseGrid mgrid(&grid);
@@ -52,9 +52,7 @@ int main(int argc, char **argv) {
         VectorSparseG u(grid), f_vec(grid), f_test(grid),fpu(grid);
         u=0.0;
 
-
-
-
+       //u = sin(2pix), f=lap(sin(2pix))
       for (unsigned long i = 0; i < grid.getMaximalOccupiedSecondTable(); i++) {
             if(grid.getActiveTable()[i]) {
                 IndexDimension I = grid.getIndexOfTable(i);
@@ -76,6 +74,7 @@ int main(int argc, char **argv) {
             }
 
         }
+
 
 
 
@@ -108,10 +107,12 @@ int main(int argc, char **argv) {
 
         calcPrewByNodal(prew,f_test);
         f_test=0.0;
-        prew =100;
+
+        // rechte Seite f_test= integral(prew*basisfunktion)
+        // m.multiplication(x,Ax,helmHoltz);
         m.multiplication(prew,f_test,helmHoltz);
 
-        exit(1);
+
 
 
 

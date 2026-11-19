@@ -569,7 +569,8 @@ WARN_LOGFILE           =
 # with spaces.
 
 
-INPUT                  = ./../library 
+INPUT                  = ./../library \
+                         ./../library/source/enrichment/README.md
 #INPUT                  =  ./SolidSLaser/program    
 
 # This tag can be used to specify the character encoding of the source files 

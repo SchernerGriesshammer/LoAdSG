@@ -44,7 +44,7 @@ endif (MPI_FOUND)
 if(MAIN_FILE)
     add_executable(${PROJECT_NAME} ${MAIN_FILE})
 else(MAIN_FILE)
-    add_executable(${PROJECT_NAME} "tests/gridgeneration.cpp")
+    add_executable(${PROJECT_NAME} "mainfiles/matrixgeneration.cpp")
 endif(MAIN_FILE)
 
 # "solve_he_params.cpp"
