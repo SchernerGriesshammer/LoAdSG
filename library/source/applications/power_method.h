@@ -99,6 +99,36 @@ public:
                             Stencil_left lhs, Stencil_right rhs,
                             bool rightoperator, double &precondition, double &duration);
 
+    /// @brief shifted inverse power iteration for A x = lambda * M x.
+    /// Every step solves (A - shift*M) y = M x_k by preconditioned CG and
+    /// normalises x_{k+1} = y / ||y||. The iteration converges to the
+    /// eigenpair whose eigenvalue lies closest to shift. Since CG needs a
+    /// symmetric positive definite system, shift must lie BELOW the smallest
+    /// eigenvalue of the problem.
+    /// @param eps stopping criterion: change in eigenvalue and in x_k
+    /// @param cg_eps stopping criterion of the inner CG solves
+    /// @param shift the shift sigma, handed over by the caller
+    /// @param x in: initial guess, out: normalised eigenvector
+    /// @param eigenvalue out: Rayleigh quotient x^T A x / x^T M x
+    /// @param iterations out: number of power iterations
+    /// @param avg_cg_iterations out: average number of CG iterations per solve
+    /// @param rightoperator if false, M is replaced by the identity
+    /// @param duration out: wall-clock time in seconds
+    /// @param max_iterations maximal number of power iterations
+    /// @param verbose print one line per power iteration (rank 0 only)
+    /// @param shift_preconditioner if true, CG is preconditioned with the
+    /// diagonal of the shifted operator, diag(A) - shift*diag(M); if false,
+    /// with diag(A) only. Falls back to diag(A) if the shifted diagonal is
+    /// not positive (which can only happen for shift > smallest eigenvalue).
+    template<class Stencil_left, class Stencil_right>
+    static bool power_inverse_shifted(double eps, double cg_eps, double shift, VectorSparseG &x,
+                            double &eigenvalue, int &iterations,
+                            double &avg_cg_iterations, MatrixVectorHomogen& matrix,
+                            Stencil_left lhs, Stencil_right rhs,
+                            bool rightoperator, double &duration,
+                            int max_iterations = 50, bool verbose = true,
+                            bool shift_preconditioner = true);
+
     template<class Stencil_left, class Stencil_right>
     static double eigenvalue_exp(MatrixVectorHomogen &matrix, Stencil_left &lhs, Stencil_right &rhs, VectorSparseG &u, AdaptiveSparseGrid &grid);
    
@@ -348,7 +378,7 @@ Power::power_inverse(double eps,double cg_eps, VectorSparseG &x, double &eigenva
 
         avg_cg_iter += cg_iterations;
 
-                int rank;
+                int rank = 0;
         #ifdef MY_MPI_ON
     
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -523,6 +553,207 @@ Power::power_inverse_riccarda(double eps,double cg_eps, VectorSparseG &x, double
 }
 
 
+/// @brief preconditioned CG for the shifted system (A - shift*M) x = f.
+/// A and M are applied separately, so no combined stencil is needed.
+/// D_inv holds the inverse of the diagonal (Jacobi) preconditioner.
+/// @return number of CG iterations
+template<class Stencil_left, class Stencil_right>
+int solve_shifted_system(double cg_eps, double shift, VectorSparseG &x, VectorSparseG &f,
+                         MatrixVectorHomogen &matrix, Stencil_left &lhs, Stencil_right &rhs,
+                         bool rightoperator, VectorSparseG &D_inv) {
+    AdaptiveSparseGrid *grid = x.getSparseGrid();
+    VectorSparseG r(grid), h(grid), d(grid), g(grid), Md(grid);
+
+    // g := (A - shift*M) * v; for shift == 0 the M product is skipped
+    auto apply = [&](VectorSparseG &v, VectorSparseG &out) {
+        out = 0.0;
+        matrix.multiplication<Stencil_left>(v, out, lhs);
+        if (shift == 0.0) return;
+        if (rightoperator) {
+            Md = 0.0;
+            matrix.multiplication<Stencil_right>(v, Md, rhs);
+        } else {
+            Md = v;
+        }
+        out = out - shift * Md;
+    };
+
+    // r = A_shift*x - f
+    apply(x, r);
+    r = r - f;
+    h = r * D_inv;
+    d = -1.0 * h;
+    double delta = product(r, h);
+
+    const int max_cg_iterations = 1000;
+    int k = 0;
+    for (int i = 1; i <= max_cg_iterations && delta > cg_eps; ++i) {
+        grid->WorkOnHangingNodes = false;
+        k = i;
+
+        apply(d, g);
+        double dg = product(d, g);
+        if (dg <= 0.0) {
+            int rank = 0;
+#ifdef MY_MPI_ON
+            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+#endif
+            if (rank == 0)
+                cout << "WARNING: A - shift*M is not positive definite (shift too large?), CG stopped." << endl;
+            break;
+        }
+        double tau = delta / dg;
+
+        r = r + (tau * g);
+        x = x + (tau * d);
+        h = r * D_inv;
+
+        double delta_prime = product(r, h);
+        if (delta_prime < cg_eps) break;
+
+        double beta = delta_prime / delta;
+        delta = delta_prime;
+        d = -1.0 * h + beta * d;
+    }
+    return k;
+}
+
+
+template<class Stencil_left, class Stencil_right>
+bool
+Power::power_inverse_shifted(double eps, double cg_eps, double shift, VectorSparseG &x,
+                             double &eigenvalue, int &iterations, double &avg_cg_iterations,
+                             MatrixVectorHomogen &matrix, Stencil_left lhs, Stencil_right rhs,
+                             bool rightoperator, double &duration, int max_iterations, bool verbose,
+                             bool shift_preconditioner) {
+
+    int rank = 0;
+#ifdef MY_MPI_ON
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+#endif
+
+    AdaptiveSparseGrid *grid = x.getSparseGrid();
+    VectorSparseG z(grid), zM(grid), D_inv(grid);
+    VectorSparseG xalt(grid), xneu(grid), y(grid), diff(grid), Ax(grid), Mx(grid);
+
+    struct timeval begin, end;
+    gettimeofday(&begin, 0);
+
+    // Jacobi preconditioner: z := diag(A), and for the shift-aware variant
+    // z := diag(A) - shift*diag(M). Every entry A_ii/M_ii is a Rayleigh
+    // quotient and hence >= the smallest eigenvalue, so the shifted diagonal
+    // is positive whenever shift lies below the smallest eigenvalue.
+    Preconditioning<Stencil_left> preconditioning(z, lhs);
+    if (shift_preconditioner && shift != 0.0) {
+        if (rightoperator) {
+            Preconditioning<Stencil_right> preconditioning_right(zM, rhs); // fills zM = diag(M)
+        } else {
+            zM = 1.0;
+        }
+        bool positive = true;
+        for (unsigned long k = 0; k < grid->getMaximalOccupiedSecondTable(); k++) {
+            if (grid->getActiveTable()[k] && z.getValue(k) - shift * zM.getValue(k) <= 0.0) {
+                positive = false;
+                break;
+            }
+        }
+        if (positive) {
+            z = z - shift * zM;
+        } else if (rank == 0) {
+            cout << "WARNING: diag(A) - shift*diag(M) is not positive (shift too large?), "
+                 << "using diag(A) as preconditioner." << endl;
+        }
+    }
+    D_inv = 0.0;
+    for (unsigned long k = 0; k < grid->getMaximalOccupiedSecondTable(); k++) {
+        if (grid->getActiveTable()[k]) D_inv.setValue(k, 1.0 / z.getValue(k));
+    }
+
+    xalt = x / sqrt(product(x, x));
+
+    // Rayleigh quotient of the initial guess, used for the first warm start
+    Ax = 0.0;
+    matrix.multiplication<Stencil_left>(xalt, Ax, lhs);
+    if (rightoperator) {
+        Mx = 0.0;
+        matrix.multiplication<Stencil_right>(xalt, Mx, rhs);
+    } else {
+        Mx = xalt;
+    }
+    double lambda = product(xalt, Ax) / product(xalt, Mx);
+    double lambda_old = lambda;
+    double sum_cg_iterations = 0.0;
+    int k = 0;
+
+    for (int i = 0; i < max_iterations; i++) {
+        k = i + 1;
+
+        // y := M * x_k
+        if (rightoperator) {
+            y = 0.0;
+            matrix.multiplication<Stencil_right>(xalt, y, rhs);
+        } else {
+            y = xalt;
+        }
+
+        // solve (A - shift*M) x_{k+1} = y. If x_k is an eigenvector to
+        // lambda, the solution is x_k / (lambda - shift), so this is the warm
+        // start. Starting from x_k itself would be off by that factor
+        // (e.g. ~30 for shift 0 here) and leave CG with a large error.
+        double lambda_shifted = lambda_old - shift;
+        if (lambda_shifted > 0.0) xneu = xalt / lambda_shifted;
+        else xneu = xalt;
+        int cg_iterations = solve_shifted_system<Stencil_left, Stencil_right>(
+                cg_eps, shift, xneu, y, matrix, lhs, rhs, rightoperator, D_inv);
+        sum_cg_iterations += cg_iterations;
+
+        // normalise and keep the sign of the previous iterate
+        xneu = xneu / sqrt(product(xneu, xneu));
+        if (product(xneu, xalt) < 0.0) xneu = -1.0 * xneu;
+
+        // Rayleigh quotient and residual ||A x - lambda M x||
+        Ax = 0.0;
+        matrix.multiplication<Stencil_left>(xneu, Ax, lhs);
+        if (rightoperator) {
+            Mx = 0.0;
+            matrix.multiplication<Stencil_right>(xneu, Mx, rhs);
+        } else {
+            Mx = xneu;
+        }
+        lambda = product(xneu, Ax) / product(xneu, Mx);
+        diff = Ax - lambda * Mx;
+        double res = sqrt(product(diff, diff));
+
+        diff = xneu - xalt;
+        double norm_diff = sqrt(product(diff, diff));
+        double change = abs(lambda - lambda_old);
+
+        if (verbose && rank == 0)
+            cout << "\tShifted Power Iteration " << i
+                 << "\t shift " << shift
+                 << "\t eigenvalue " << std::scientific << std::setprecision(12) << lambda
+                 << "\t abs(lambda_old-lambda) " << std::setprecision(3) << change
+                 << "\t diff " << norm_diff
+                 << "\t res " << res
+                 << "\t cg_iterations " << cg_iterations
+                 << std::defaultfloat << std::setprecision(6) << endl;
+
+        xalt = xneu;
+        lambda_old = lambda;
+
+        if (i > 0 && change < eps && norm_diff < eps) break;
+    }
+
+    gettimeofday(&end, 0);
+    duration = (end.tv_sec - begin.tv_sec) + (end.tv_usec - begin.tv_usec) * 1e-6;
+
+    eigenvalue = lambda;
+    iterations = k;
+    avg_cg_iterations = sum_cg_iterations / k;
+    x = xalt;
+
+    return true;
+}
 
 
 #endif //GRUN_CG_METHOD_H

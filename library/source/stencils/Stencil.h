@@ -874,6 +874,32 @@ class HelmHoltz: public StencilTemplate{
 public:
     HelmHoltz(AdaptiveSparseGrid& grid_): StencilTemplate(grid_){};
 
+    /// @name Enrichment (see source/enrichment)
+    /// @{
+
+    /**
+     * @brief Integrand of the coupling entry \f$\int\varphi_p\,g\,dx\f$ at the point \p x.
+     * @tparam Phi prewavelet type (Prewavelet), needs `value(const double*)`
+     * @tparam G enrichment function, needs `value(const double*)`
+     * @ingroup enrichment
+     */
+    template<class Phi, class G>
+    inline double enrich_integrand(const Phi &phi, const G &g, double *x) const {
+        return phi.value(x) * g.value(x);
+    }
+
+    /**
+     * @brief Integrand of \f$\int v\,w\,dx\f$ at the point \p x (bilinear form of two functions, e.g. \f$B_{gg}\f$).
+     * @tparam V function with `value(const double*)`
+     * @tparam W function with `value(const double*)`
+     * @ingroup enrichment
+     */
+    template<class V, class W>
+    inline double enrich_integrand_pair(const V &v, const W &w, double *x) const {
+        return v.value(x) * w.value(x);
+    }
+    /// @}
+
 
     inline double localValue(const IndexDimension &center ,const IndexDimension& cell, const MultiDimCompass &mc)const{
 
@@ -1605,6 +1631,41 @@ private:
 class Poisson : public StencilTemplate{
 public:
     Poisson(AdaptiveSparseGrid& grid_): StencilTemplate(grid_){};
+
+    /// @name Enrichment (see source/enrichment)
+    /// @{
+
+    /**
+     * @brief Integrand of the coupling entry \f$\int\nabla\varphi_p\cdot\nabla g\,dx\f$ at the point \p x.
+     * @tparam Phi prewavelet type (Prewavelet), needs `gradient(const double*, double*)`
+     * @tparam G enrichment function, needs `gradient(const double*, double*)`
+     * @ingroup enrichment
+     */
+    template<class Phi, class G>
+    inline double enrich_integrand(const Phi &phi, const G &g, double *x) const {
+        double gp[DimensionSparseGrid], gg[DimensionSparseGrid], s = 0.0;
+        phi.gradient(x, gp);
+        g.gradient(x, gg);
+        for (int d = 0; d < DimensionSparseGrid; d++) s += gp[d] * gg[d];
+        return s;
+    }
+
+    /**
+     * @brief Integrand of \f$\int\nabla v\cdot\nabla w\,dx\f$ at the point \p x (bilinear form of two
+     *        functions, e.g. \f$A_{gg}\f$, \f$a(u,g)\f$).
+     * @tparam V function with `gradient(const double*, double*)`
+     * @tparam W function with `gradient(const double*, double*)`
+     * @ingroup enrichment
+     */
+    template<class V, class W>
+    inline double enrich_integrand_pair(const V &v, const W &w, double *x) const {
+        double gv[DimensionSparseGrid], gw[DimensionSparseGrid], s = 0.0;
+        v.gradient(x, gv);
+        w.gradient(x, gw);
+        for (int d = 0; d < DimensionSparseGrid; d++) s += gv[d] * gw[d];
+        return s;
+    }
+    /// @}
 
     TypeMatrixVectorMultiplication getTypeMatrixVectorMultiplication(){
         return StencilOnTheFly;

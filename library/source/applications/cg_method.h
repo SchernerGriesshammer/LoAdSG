@@ -6,6 +6,7 @@
 #define GRUN_CG_METHOD_H
 
 
+#include <iomanip>
 #include <sys/time.h>
 #include <unordered_set>
 #include "../MatrixVectorMultiplication/MatrixVectorHomogen.h"
@@ -16,6 +17,8 @@ class Preconditioning{
 public:
     Preconditioning(VectorSparseG& z_, StencilClass stencilClass, bool constant = false) : z(z_), boundary(false)
     {
+
+
         if (!constant){
             if(stencilClass.getTypeMatrixVectorMultiplication()==StencilOnTheFly) precond3(stencilClass);
             else{
@@ -23,8 +26,7 @@ public:
             }
 
             MPI_Barrier(MPI_COMM_WORLD);
-        }else
-        {
+        }else {
             int level = z.getSparseGrid()->getLevel();
             double val = pow(2.0,level);
             for (unsigned long k = 0; k < z.getSparseGrid()->getMaximalOccupiedSecondTable(); k++)
@@ -1207,7 +1209,10 @@ CG::solveHomogen(double eps, VectorSparseG &x,VectorSparseG &f,int *iterations,
 
     delta = product(r, h);
 
-
+    const double delta0 = delta;
+    std::vector<double> taus, betas;
+    taus.reserve(maxIteration);
+    betas.reserve(maxIteration);
 
 
     int k = 0;
@@ -1223,6 +1228,7 @@ CG::solveHomogen(double eps, VectorSparseG &x,VectorSparseG &f,int *iterations,
 
 
         tau = double(delta / product(d, g));
+        taus.push_back(tau);
 
         r = r + (tau * g);
         x = x - (tau * d);
@@ -1231,17 +1237,34 @@ CG::solveHomogen(double eps, VectorSparseG &x,VectorSparseG &f,int *iterations,
 
         P.apply_inverse(&h);
         delta_prime = product(r, h);
-        if (delta_prime < eps) break;
+
 
 
         beta = delta_prime / delta;
+        betas.push_back(beta);
         delta = delta_prime;
+        if (delta_prime < eps) break;
         d = -1.0*h + beta * d;
 
 
     }
 
+    int rank = 0;
 
+#ifdef MY_MPI_ON
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+#endif
+
+
+    if (rank == 0){
+        cout << "delta" <<  std::setprecision(17) << delta0 << endl;
+        cout << "taus :" << "\n";
+        for (double t : taus)  cout << t << " ";  cout << "\n";
+        cout << endl;
+        cout << "betas :" << "\n";
+        for (double b : betas) cout << b << " ";  cout << "\n";
+        cout << endl;
+    }
     //cout << "CG finished after " << k << " iterations and residuum delta = " << sqrt(delta_prime) << endl;
     *iterations = k;
     count++;
